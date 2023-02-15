@@ -6,6 +6,7 @@ import com.intellij.ide.util.PackageChooserDialog;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.LangDataKeys;
 import com.intellij.openapi.actionSystem.PlatformDataKeys;
+import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.fileChooser.FileChooserDescriptorFactory;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.Messages;
@@ -39,6 +40,8 @@ import java.util.List;
  * @Date: 2023/2/8 14:36
  */
 public class MybatisPlusGeneratorMainUI extends JFrame {
+
+    private static final Logger LOG = Logger.getInstance(MybatisPlusGeneratorMainUI.class);
 
     private AnActionEvent anActionEvent;
     private Project project;
@@ -333,8 +336,9 @@ public class MybatisPlusGeneratorMainUI extends JFrame {
                 Messages.showMessageDialog(Joiner.on("\n").join(result), "warnning", Messages.getWarningIcon());
             }
 
-        } catch (Exception e1) {
-            Messages.showMessageDialog(e1.getMessage(), "error", Messages.getErrorIcon());
+        } catch (Exception e) {
+            LOG.error("generate failed:",e);
+            Messages.showMessageDialog(e.getMessage(), "error", Messages.getErrorIcon());
         } finally {
             dispose();
         }
