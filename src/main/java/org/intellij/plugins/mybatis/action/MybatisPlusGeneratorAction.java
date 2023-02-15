@@ -28,6 +28,7 @@ public class MybatisPlusGeneratorAction extends AnAction {
                 return;
             }
         }
-        new MybatisPlusGeneratorMainUI(e);
+        MybatisPlusGeneratorMainUI ui = new MybatisPlusGeneratorMainUI(e);
+        ui.draw();
     }
 }

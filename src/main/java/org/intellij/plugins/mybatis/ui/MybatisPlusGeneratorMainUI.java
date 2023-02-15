@@ -65,12 +65,18 @@ public class MybatisPlusGeneratorMainUI extends JFrame {
     private JTextField daoMvnField = new JBTextField(15);
     private JTextField xmlMvnField = new JBTextField(15);
 
+    private JCheckBox overrideFileBox = new JCheckBox("是否覆盖原有文件");
+    private JCheckBox useLombokBox = new JCheckBox("是否使用lombok");
+    private JCheckBox serializableBox = new JCheckBox("是否实现序列化接口");
+
 
     public MybatisPlusGeneratorMainUI(AnActionEvent anActionEvent) {
         this.anActionEvent = anActionEvent;
         this.project = anActionEvent.getData(PlatformDataKeys.PROJECT);
         this.psiElements = anActionEvent.getData(LangDataKeys.PSI_ELEMENT_ARRAY);
+    }
 
+    public void draw() {
         setTitle("MyBatis Plus Generate Tool");
         setPreferredSize(new Dimension(1200, 700));//设置大小
         setLocation(120, 100);
@@ -109,16 +115,18 @@ public class MybatisPlusGeneratorMainUI extends JFrame {
             tableNameField.addFocusListener(new JTextFieldHintListener(tableNameField, "eg:db_table"));
         } else {
             tableNameField.setText(tableName);
+            tableNameField.setEnabled(false);
         }
         tableNameFieldPanel.add(tableNameField);
 
         JPanel keyFieldPanel = new JPanel();
         keyFieldPanel.setLayout(new FlowLayout(FlowLayout.CENTER));
-        keyFieldPanel.add(new JLabel("主键（选填）:"));
+        keyFieldPanel.add(new JLabel("primary key:"));
         if (psiElements.length > 1) {
             keyField.addFocusListener(new JTextFieldHintListener(keyField, "eg:primary key"));
         } else {
             keyField.setText(primaryKey);
+            keyField.setEnabled(false);
         }
         keyFieldPanel.add(keyField);
 
@@ -229,11 +237,23 @@ public class MybatisPlusGeneratorMainUI extends JFrame {
         xmlMapperPanel.setBorder(BorderFactory.createTitledBorder("xml mapper setting"));
         JLabel labelLeft6 = new JLabel("package:");
         xmlMapperPanel.add(labelLeft6);
-        xmlPackageField.setText("generator");
+        xmlPackageField.setText("mapper");
         xmlMapperPanel.add(xmlPackageField);
         xmlMapperPanel.add(new JLabel("path:"));
         xmlMvnField.setText("src/main/resources");
         xmlMapperPanel.add(xmlMvnField);
+
+        /**
+         * options
+         */
+        JBPanel optionsPanel = new JBPanel(new GridLayout(5, 5, 5, 5));
+        optionsPanel.setBorder(BorderFactory.createTitledBorder("options"));
+        overrideFileBox.setSelected(true);
+        serializableBox.setSelected(true);
+        optionsPanel.add(overrideFileBox);
+        optionsPanel.add(useLombokBox);
+        optionsPanel.add(serializableBox);
+
 
         JPanel mainPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
         mainPanel.setBorder(new EmptyBorder(10, 30, 5, 40));
@@ -244,7 +264,7 @@ public class MybatisPlusGeneratorMainUI extends JFrame {
         mainPanel.add(modelPanel);
         mainPanel.add(daoPanel);
         mainPanel.add(xmlMapperPanel);
-
+        mainPanel.add(optionsPanel);
 
         JPanel paneBottom = new JPanel();//确认和取消按钮
         paneBottom.setLayout(new FlowLayout(2));
@@ -302,6 +322,10 @@ public class MybatisPlusGeneratorMainUI extends JFrame {
                 generator_config.setDaoMvnPath(daoMvnField.getText());
                 generator_config.setXmlMvnPath(xmlMvnField.getText());
 
+                generator_config.setOverrideFile(overrideFileBox.getSelectedObjects() != null);
+                generator_config.setUseLombokPlugin(useLombokBox.getSelectedObjects() != null);
+                generator_config.setSerializable(serializableBox.getSelectedObjects() != null);
+
                 result = new MybatisPlusGenerator(generator_config).execute(anActionEvent, psiElements[0]);
             } else {
 
@@ -328,6 +352,11 @@ public class MybatisPlusGeneratorMainUI extends JFrame {
                     generator_config.setModelMvnPath(modelMvnField.getText());
                     generator_config.setDaoMvnPath(daoMvnField.getText());
                     generator_config.setXmlMvnPath(xmlMvnField.getText());
+
+                    generator_config.setOverrideFile(overrideFileBox.getSelectedObjects() != null);
+                    generator_config.setUseLombokPlugin(useLombokBox.getSelectedObjects() != null);
+                    generator_config.setSerializable(serializableBox.getSelectedObjects() != null);
+
                     result = new MybatisPlusGenerator(generator_config).execute(anActionEvent, psiElement);
                 }
 

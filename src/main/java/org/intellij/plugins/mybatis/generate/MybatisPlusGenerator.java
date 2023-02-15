@@ -15,8 +15,6 @@ import com.baomidou.mybatisplus.generator.engine.FreemarkerTemplateEngine;
 import com.intellij.database.model.RawConnectionConfig;
 import com.intellij.database.psi.DbTable;
 import com.intellij.openapi.actionSystem.AnActionEvent;
-import com.intellij.openapi.actionSystem.PlatformDataKeys;
-import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiElement;
 import main.java.org.intellij.plugins.mybatis.model.Config;
 
@@ -28,8 +26,6 @@ import java.util.Objects;
  * 生成mybatis相关代码
  */
 public class MybatisPlusGenerator {
-    private String currentDbName;
-    private Project project;
     private Config config;//界面默认配置
 
     public MybatisPlusGenerator(Config config) {
@@ -43,7 +39,6 @@ public class MybatisPlusGenerator {
      */
     public List<String> execute(final AnActionEvent anActionEvent, PsiElement psiElement) throws Exception {
         List<String> result = new ArrayList<>();
-        this.project = anActionEvent.getData(PlatformDataKeys.PROJECT);
 
         if (Objects.isNull(psiElement)) {
             result.add("can not generate! \nplease select table");
@@ -56,23 +51,27 @@ public class MybatisPlusGenerator {
         AutoGeneratorExtend autoGeneratorExtend = new AutoGeneratorExtend(psiElement, config);
         GlobalConfig globalConfig = new GlobalConfig()
                 .setOutputDir(config.getProjectFolder())
-                .setFileOverride(true)
+                .setEntityMvnPath(config.getModelMvnPath())
+                .setMapperMvnPath(config.getDaoMvnPath())
+                .setXmlMvnPath(config.getXmlMvnPath())
+                .setFileOverride(config.isOverrideFile())
                 .setAuthor("auto generate")
                 .setDateType(DateType.ONLY_DATE)
                 .setBaseColumnList(true)
                 .setIdType(IdType.AUTO)
-                .setBaseResultMap(true);
+                .setBaseResultMap(true)
+                .setOpen(false);
         StrategyConfig strategyConfig = new StrategyConfig()
                 .setNaming(NamingStrategy.underline_to_camel)
                 .setColumnNaming(NamingStrategy.underline_to_camel)
-                .setEntityLombokModel(true)
+                .setEntityLombokModel(config.isUseLombokPlugin())
                 .setEntityTableFieldAnnotationEnable(true)
-                .setEntitySerialVersionUID(true)
-                .setRestControllerStyle(true);
+                .setEntitySerialVersionUID(config.isSerializable());
         PackageConfig packageConfig = new PackageConfig()
-                .setParent("com.ccccit.collect.server")
-                .setEntity("model")
-                .setMapper("dao");
+                .setParent(null)
+                .setEntity(config.getModelPackage())
+                .setMapper(config.getDaoPackage())
+                .setXml(config.getXmlPackage());
         TemplateConfig templateConfig = new TemplateConfig()
                 .setController(null)
                 .setService(null)
@@ -96,22 +95,16 @@ public class MybatisPlusGenerator {
         String driverClass = connectionConfig.getDriverClass();
         DbType dbType;
         if (driverClass.contains("mysql")) {
-            currentDbName = ((DbTable) psiElement).getParent().getName();
             dbType = DbType.MYSQL;
         } else if (driverClass.contains("oracle")) {
-            currentDbName = ((DbTable) psiElement).getParent().getName();
             dbType = DbType.ORACLE;
         } else if (driverClass.contains("postgresql")) {
-            currentDbName = ((DbTable) psiElement).getParent().getParent().getName();
             dbType = DbType.POSTGRE_SQL;
         } else if (driverClass.contains("sqlserver")) {
-            currentDbName = ((DbTable) psiElement).getParent().getName();
             dbType = DbType.SQL_SERVER;
         } else if (driverClass.contains("mariadb")) {
-            currentDbName = ((DbTable) psiElement).getParent().getName();
             dbType = DbType.MARIADB;
         } else {
-            currentDbName = ((DbTable) psiElement).getParent().getName();
             dbType = DbType.OTHER;
         }
         dsc.setDbType(dbType);
