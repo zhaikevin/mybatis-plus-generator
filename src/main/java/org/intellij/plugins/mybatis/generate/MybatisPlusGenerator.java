@@ -60,7 +60,8 @@ public class MybatisPlusGenerator {
                 .setBaseColumnList(true)
                 .setIdType(IdType.AUTO)
                 .setBaseResultMap(true)
-                .setOpen(false);
+                .setOpen(false)
+                .setSwagger2(config.isSwagger());
         StrategyConfig strategyConfig = new StrategyConfig()
                 .setNaming(NamingStrategy.underline_to_camel)
                 .setColumnNaming(NamingStrategy.underline_to_camel)

@@ -61,6 +61,8 @@ public class Config {
 
     private boolean serializable;
 
+    private boolean swagger;
+
     public boolean isUseLombokPlugin() {
         return useLombokPlugin;
     }
@@ -205,5 +207,13 @@ public class Config {
 
     public void setSerializable(boolean serializable) {
         this.serializable = serializable;
+    }
+
+    public boolean isSwagger() {
+        return swagger;
+    }
+
+    public void setSwagger(boolean swagger) {
+        this.swagger = swagger;
     }
 }

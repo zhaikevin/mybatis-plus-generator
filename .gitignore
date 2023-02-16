@@ -6,5 +6,6 @@ target
 .idea
 hengji-server.iml
 *.iml
-plugin-log.jar
+mybatis-plus-generator.jar
+mybatis-plus-generator.zip
 out

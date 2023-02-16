@@ -68,6 +68,7 @@ public class MybatisPlusGeneratorMainUI extends JFrame {
     private JCheckBox overrideFileBox = new JCheckBox("是否覆盖原有文件");
     private JCheckBox useLombokBox = new JCheckBox("是否使用lombok");
     private JCheckBox serializableBox = new JCheckBox("是否实现序列化接口");
+    private JCheckBox useSwaggerBox = new JCheckBox("是否加swagger");
 
 
     public MybatisPlusGeneratorMainUI(AnActionEvent anActionEvent) {
@@ -78,7 +79,7 @@ public class MybatisPlusGeneratorMainUI extends JFrame {
 
     public void draw() {
         setTitle("MyBatis Plus Generate Tool");
-        setPreferredSize(new Dimension(1200, 700));//设置大小
+        setPreferredSize(new Dimension(800, 500));//设置大小
         setLocation(120, 100);
         pack();
         setVisible(true);
@@ -246,13 +247,14 @@ public class MybatisPlusGeneratorMainUI extends JFrame {
         /**
          * options
          */
-        JBPanel optionsPanel = new JBPanel(new GridLayout(5, 5, 5, 5));
+        JBPanel optionsPanel = new JBPanel(new GridLayout(1, 5, 5, 5));
         optionsPanel.setBorder(BorderFactory.createTitledBorder("options"));
         overrideFileBox.setSelected(true);
         serializableBox.setSelected(true);
         optionsPanel.add(overrideFileBox);
         optionsPanel.add(useLombokBox);
         optionsPanel.add(serializableBox);
+        optionsPanel.add(useSwaggerBox);
 
 
         JPanel mainPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
@@ -325,7 +327,7 @@ public class MybatisPlusGeneratorMainUI extends JFrame {
                 generator_config.setOverrideFile(overrideFileBox.getSelectedObjects() != null);
                 generator_config.setUseLombokPlugin(useLombokBox.getSelectedObjects() != null);
                 generator_config.setSerializable(serializableBox.getSelectedObjects() != null);
-
+                generator_config.setSwagger(useSwaggerBox.getSelectedObjects() != null);
                 result = new MybatisPlusGenerator(generator_config).execute(anActionEvent, psiElements[0]);
             } else {
 
@@ -356,6 +358,7 @@ public class MybatisPlusGeneratorMainUI extends JFrame {
                     generator_config.setOverrideFile(overrideFileBox.getSelectedObjects() != null);
                     generator_config.setUseLombokPlugin(useLombokBox.getSelectedObjects() != null);
                     generator_config.setSerializable(serializableBox.getSelectedObjects() != null);
+                    generator_config.setSwagger(useSwaggerBox.getSelectedObjects() != null);
 
                     result = new MybatisPlusGenerator(generator_config).execute(anActionEvent, psiElement);
                 }
@@ -366,7 +369,7 @@ public class MybatisPlusGeneratorMainUI extends JFrame {
             }
 
         } catch (Exception e) {
-            LOG.error("generate failed:",e);
+            LOG.error("generate failed:", e);
             Messages.showMessageDialog(e.getMessage(), "error", Messages.getErrorIcon());
         } finally {
             dispose();

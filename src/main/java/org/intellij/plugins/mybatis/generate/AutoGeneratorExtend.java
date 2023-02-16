@@ -15,6 +15,7 @@ import com.intellij.database.util.DasUtil;
 import com.intellij.psi.PsiElement;
 import com.intellij.util.containers.JBIterable;
 import main.java.org.intellij.plugins.mybatis.model.Config;
+import main.java.org.intellij.plugins.mybatis.utils.StringUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -71,7 +72,7 @@ public class AutoGeneratorExtend extends AutoGenerator {
             field.setType(column.getDataType().typeName.toUpperCase());
             field.setPropertyName(configBuilder.getStrategyConfig(), processName(column.getName(), configBuilder.getStrategyConfig()));
             field.setColumnType(super.getDataSource().getTypeConvert().processTypeConvert(configBuilder.getGlobalConfig(), field.getType()));
-            field.setComment(column.getComment());
+            field.setComment(StringUtils.replaceQuotation(column.getComment()));
             field.setKeyFlag(false);
             if (configBuilder.getStrategyConfig().includeSuperEntityColumns(field.getName())) {
                 // 跳过公共字段

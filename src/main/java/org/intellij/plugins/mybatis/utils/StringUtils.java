@@ -32,4 +32,15 @@ public class StringUtils {
     public static boolean isEmpty(Object str) {
         return str == null || "".equals(str);
     }
+
+    public static String replaceQuotation(String str) {
+        if (isEmpty(str)) {
+            return str;
+        }
+        return str.replace("\"","\\\"");
+    }
+
+    public static void main(String args[]) {
+        System.out.println(replaceQuotation("需要强制更新的版本\",\"分割"));
+    }
 }
