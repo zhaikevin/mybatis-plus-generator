@@ -54,8 +54,11 @@ public class Config {
     /**
      * 是否覆盖原xml
      */
-    private boolean overrideFile;
+    private boolean overrideModelFile;
 
+    private boolean overrideDaoFile;
+
+    private boolean overrideXmlFile;
 
     private boolean useLombokPlugin;
 
@@ -193,12 +196,28 @@ public class Config {
         this.daoName = daoName;
     }
 
-    public boolean isOverrideFile() {
-        return overrideFile;
+    public boolean isOverrideModelFile() {
+        return overrideModelFile;
     }
 
-    public void setOverrideFile(boolean overrideFile) {
-        this.overrideFile = overrideFile;
+    public void setOverrideModelFile(boolean overrideModelFile) {
+        this.overrideModelFile = overrideModelFile;
+    }
+
+    public boolean isOverrideDaoFile() {
+        return overrideDaoFile;
+    }
+
+    public void setOverrideDaoFile(boolean overrideDaoFile) {
+        this.overrideDaoFile = overrideDaoFile;
+    }
+
+    public boolean isOverrideXmlFile() {
+        return overrideXmlFile;
+    }
+
+    public void setOverrideXmlFile(boolean overrideXmlFile) {
+        this.overrideXmlFile = overrideXmlFile;
     }
 
     public boolean isSerializable() {

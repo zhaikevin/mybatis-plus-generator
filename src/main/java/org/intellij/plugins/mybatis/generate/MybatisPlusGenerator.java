@@ -3,6 +3,7 @@ package main.java.org.intellij.plugins.mybatis.generate;
 
 import com.baomidou.mybatisplus.annotation.DbType;
 import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.generator.InjectionConfig;
 import com.baomidou.mybatisplus.generator.config.DataSourceConfig;
 import com.baomidou.mybatisplus.generator.config.GlobalConfig;
 import com.baomidou.mybatisplus.generator.config.PackageConfig;
@@ -18,9 +19,11 @@ import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.psi.PsiElement;
 import main.java.org.intellij.plugins.mybatis.model.Config;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+
 
 /**
  * 生成mybatis相关代码
@@ -54,7 +57,6 @@ public class MybatisPlusGenerator {
                 .setEntityMvnPath(config.getModelMvnPath())
                 .setMapperMvnPath(config.getDaoMvnPath())
                 .setXmlMvnPath(config.getXmlMvnPath())
-                .setFileOverride(config.isOverrideFile())
                 .setAuthor("auto generate")
                 .setDateType(DateType.ONLY_DATE)
                 .setBaseColumnList(true)
@@ -78,12 +80,36 @@ public class MybatisPlusGenerator {
                 .setService(null)
                 .setServiceImpl(null);
         AbstractTemplateEngine templateEngine = new FreemarkerTemplateEngine();
+        InjectionConfig injectionConfig = new InjectionConfig() {
+            @Override
+            public void initMap() {
+
+            }
+        }.setFileCreate((configBuilder, fileType, filePath) -> {
+            File file = new File(filePath);
+            boolean exist = file.exists();
+            if (!exist) {
+                file.getParentFile().mkdirs();
+                return true;
+            }
+            switch (fileType) {
+                case ENTITY:
+                    return config.isOverrideModelFile();
+                case MAPPER:
+                    return config.isOverrideDaoFile();
+                case XML:
+                    return config.isOverrideXmlFile();
+                default:
+                    return configBuilder.getGlobalConfig().isFileOverride();
+            }
+        });
         autoGeneratorExtend.setGlobalConfig(globalConfig);
         autoGeneratorExtend.setDataSource(getDataSourceConfig(psiElement));
         autoGeneratorExtend.setStrategy(strategyConfig);
         autoGeneratorExtend.setPackageInfo(packageConfig);
         autoGeneratorExtend.setTemplate(templateConfig);
         autoGeneratorExtend.setTemplateEngine(templateEngine);
+        autoGeneratorExtend.setCfg(injectionConfig);
         autoGeneratorExtend.execute();
         return result;
     }

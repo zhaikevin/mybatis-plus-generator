@@ -65,11 +65,12 @@ public class MybatisPlusGeneratorMainUI extends JFrame {
     private JTextField daoMvnField = new JBTextField(15);
     private JTextField xmlMvnField = new JBTextField(15);
 
-    private JCheckBox overrideFileBox = new JCheckBox("是否覆盖原有文件");
+    private JCheckBox overrideModelFileBox = new JCheckBox("是否覆盖原Model文件");
     private JCheckBox useLombokBox = new JCheckBox("是否使用lombok");
     private JCheckBox serializableBox = new JCheckBox("是否实现序列化接口");
     private JCheckBox useSwaggerBox = new JCheckBox("是否加swagger");
-
+    private JCheckBox overrideDaoFileBox = new JCheckBox("是否覆盖原Dao文件");
+    private JCheckBox overrideXmlFileBox = new JCheckBox("是否覆盖原Xml文件");
 
     public MybatisPlusGeneratorMainUI(AnActionEvent anActionEvent) {
         this.anActionEvent = anActionEvent;
@@ -79,7 +80,7 @@ public class MybatisPlusGeneratorMainUI extends JFrame {
 
     public void draw() {
         setTitle("MyBatis Plus Generate Tool");
-        setPreferredSize(new Dimension(800, 500));//设置大小
+        setPreferredSize(new Dimension(800, 600));//设置大小
         setLocation(120, 100);
         pack();
         setVisible(true);
@@ -247,11 +248,14 @@ public class MybatisPlusGeneratorMainUI extends JFrame {
         /**
          * options
          */
-        JBPanel optionsPanel = new JBPanel(new GridLayout(1, 5, 5, 5));
+        JBPanel optionsPanel = new JBPanel(new GridLayout(2, 5, 5, 5));
         optionsPanel.setBorder(BorderFactory.createTitledBorder("options"));
-        overrideFileBox.setSelected(true);
+        overrideModelFileBox.setSelected(true);
+        overrideXmlFileBox.setSelected(true);
         serializableBox.setSelected(true);
-        optionsPanel.add(overrideFileBox);
+        optionsPanel.add(overrideModelFileBox);
+        optionsPanel.add(overrideDaoFileBox);
+        optionsPanel.add(overrideXmlFileBox);
         optionsPanel.add(useLombokBox);
         optionsPanel.add(serializableBox);
         optionsPanel.add(useSwaggerBox);
@@ -324,7 +328,9 @@ public class MybatisPlusGeneratorMainUI extends JFrame {
                 generator_config.setDaoMvnPath(daoMvnField.getText());
                 generator_config.setXmlMvnPath(xmlMvnField.getText());
 
-                generator_config.setOverrideFile(overrideFileBox.getSelectedObjects() != null);
+                generator_config.setOverrideModelFile(overrideModelFileBox.getSelectedObjects() != null);
+                generator_config.setOverrideDaoFile(overrideDaoFileBox.getSelectedObjects() != null);
+                generator_config.setOverrideXmlFile(overrideXmlFileBox.getSelectedObjects() != null);
                 generator_config.setUseLombokPlugin(useLombokBox.getSelectedObjects() != null);
                 generator_config.setSerializable(serializableBox.getSelectedObjects() != null);
                 generator_config.setSwagger(useSwaggerBox.getSelectedObjects() != null);
@@ -355,7 +361,9 @@ public class MybatisPlusGeneratorMainUI extends JFrame {
                     generator_config.setDaoMvnPath(daoMvnField.getText());
                     generator_config.setXmlMvnPath(xmlMvnField.getText());
 
-                    generator_config.setOverrideFile(overrideFileBox.getSelectedObjects() != null);
+                    generator_config.setOverrideModelFile(overrideModelFileBox.getSelectedObjects() != null);
+                    generator_config.setOverrideDaoFile(overrideDaoFileBox.getSelectedObjects() != null);
+                    generator_config.setOverrideXmlFile(overrideXmlFileBox.getSelectedObjects() != null);
                     generator_config.setUseLombokPlugin(useLombokBox.getSelectedObjects() != null);
                     generator_config.setSerializable(serializableBox.getSelectedObjects() != null);
                     generator_config.setSwagger(useSwaggerBox.getSelectedObjects() != null);
