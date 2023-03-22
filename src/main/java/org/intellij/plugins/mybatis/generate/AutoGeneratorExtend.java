@@ -1,5 +1,6 @@
 package main.java.org.intellij.plugins.mybatis.generate;
 
+import com.baomidou.mybatisplus.annotation.DbType;
 import com.baomidou.mybatisplus.generator.AutoGenerator;
 import com.baomidou.mybatisplus.generator.config.StrategyConfig;
 import com.baomidou.mybatisplus.generator.config.builder.ConfigBuilder;
@@ -14,6 +15,9 @@ import com.intellij.database.psi.DbTable;
 import com.intellij.database.util.DasUtil;
 import com.intellij.psi.PsiElement;
 import com.intellij.util.containers.JBIterable;
+import main.java.org.intellij.plugins.mybatis.convert.DefaultJdbcTypeConvert;
+import main.java.org.intellij.plugins.mybatis.convert.IJdbcTypeConvert;
+import main.java.org.intellij.plugins.mybatis.convert.MysqlJdbcTypeConvert;
 import main.java.org.intellij.plugins.mybatis.model.Config;
 import main.java.org.intellij.plugins.mybatis.utils.StringUtils;
 
@@ -30,6 +34,8 @@ public class AutoGeneratorExtend extends AutoGenerator {
     private PsiElement psiElement;
 
     private Config config;//界面默认配置
+
+    private IJdbcTypeConvert jdbcTypeConvert;
 
     public AutoGeneratorExtend(PsiElement psiElement, Config config) {
         super();
@@ -69,7 +75,7 @@ public class AutoGeneratorExtend extends AutoGenerator {
         for (DasColumn column : columns) {
             TableField field = new TableField();
             field.setName(column.getName());
-            field.setType(column.getDataType().typeName.toUpperCase());
+            field.setType(getTypeConvert().processTypeConvert(column.getDataType().typeName.toUpperCase()));
             field.setPropertyName(configBuilder.getStrategyConfig(), processName(column.getName(), configBuilder.getStrategyConfig()));
             field.setColumnType(super.getDataSource().getTypeConvert().processTypeConvert(configBuilder.getGlobalConfig(), field.getType()));
             field.setComment(StringUtils.replaceQuotation(column.getComment()));
@@ -144,6 +150,21 @@ public class AutoGeneratorExtend extends AutoGenerator {
             propertyName = name;
         }
         return propertyName;
+    }
+
+    private IJdbcTypeConvert getTypeConvert() {
+        if (jdbcTypeConvert != null) {
+            return jdbcTypeConvert;
+        }
+        DbType dbType = super.getDataSource().getDbType();
+        switch (dbType) {
+            case MYSQL:
+                this.jdbcTypeConvert = new MysqlJdbcTypeConvert();
+                break;
+            default:
+                this.jdbcTypeConvert = new DefaultJdbcTypeConvert();
+        }
+        return jdbcTypeConvert;
     }
 
 }
