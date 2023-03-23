@@ -17,6 +17,7 @@ import com.intellij.database.model.RawConnectionConfig;
 import com.intellij.database.psi.DbTable;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.psi.PsiElement;
+import main.java.org.intellij.plugins.mybatis.engine.TemplateEngineDecorator;
 import main.java.org.intellij.plugins.mybatis.model.Config;
 
 import java.io.File;
@@ -108,7 +109,7 @@ public class MybatisPlusGenerator {
         autoGeneratorExtend.setStrategy(strategyConfig);
         autoGeneratorExtend.setPackageInfo(packageConfig);
         autoGeneratorExtend.setTemplate(templateConfig);
-        autoGeneratorExtend.setTemplateEngine(templateEngine);
+        autoGeneratorExtend.setTemplateEngine(new TemplateEngineDecorator(templateEngine));
         autoGeneratorExtend.setCfg(injectionConfig);
         autoGeneratorExtend.execute();
         return result;
