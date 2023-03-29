@@ -31,6 +31,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -97,7 +98,6 @@ public class MybatisPlusGeneratorMainUI extends JFrame {
             primaryKey = tableInfo.getPrimaryKeys().get(0);
         }
         String projectFolder = project.getBasePath();
-
         boolean multiTable;
         if (psiElements.length > 1) {//多表时，只使用默认配置
             multiTable = true;
@@ -157,7 +157,14 @@ public class MybatisPlusGeneratorMainUI extends JFrame {
         JLabel projectLabel = new JLabel("project folder:");
         projectFolderPanel.add(projectLabel);
         projectFolderBtn.setTextFieldPreferredWidth(45);
-        projectFolderBtn.setText(projectFolder);
+        String lastPath = projectFolder.substring(projectFolder.lastIndexOf("/") + 1);
+        String subFolderPath = projectFolder + "/" + lastPath + "-server";
+        File file = new File(subFolderPath);
+        if (file.exists()) {
+            projectFolderBtn.setText(subFolderPath);
+        } else {
+            projectFolderBtn.setText(projectFolder);
+        }
         projectFolderBtn.addBrowseFolderListener(new TextBrowseFolderListener(
                 FileChooserDescriptorFactory.createSingleFileOrFolderDescriptor()) {
             @Override
