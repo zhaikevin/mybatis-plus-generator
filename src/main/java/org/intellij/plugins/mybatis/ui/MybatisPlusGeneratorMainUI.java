@@ -59,6 +59,7 @@ public class MybatisPlusGeneratorMainUI extends JFrame {
     private JTextField daoNameField = new JTextField(10);
     private JTextField modelNameField = new JTextField(10);
     private JTextField keyField = new JTextField(10);
+    private JTextField tableNamePrefixField = new JTextField(10);
 
     private TextFieldWithBrowseButton projectFolderBtn = new TextFieldWithBrowseButton();
     private JTextField modelMvnField = new JBTextField(15);
@@ -132,10 +133,20 @@ public class MybatisPlusGeneratorMainUI extends JFrame {
         }
         keyFieldPanel.add(keyField);
 
+        JPanel tableNamePrefixPanel = new JPanel();
+        tableNamePrefixPanel.setLayout(new FlowLayout(FlowLayout.CENTER));
+        tableNamePrefixPanel.add(new JLabel("table name prefix:"));
+        tableNamePrefixField.addFocusListener(new JTextFieldHintListener(tableNamePrefixField, "eg:tb_"));
+        tableNamePrefixPanel.add(tableNamePrefixField);
+
         JPanel tablePanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
         tablePanel.setBorder(BorderFactory.createTitledBorder("table setting"));
-        tablePanel.add(tableNameFieldPanel);
-        tablePanel.add(keyFieldPanel);
+        if (psiElements.length > 1) {
+            tablePanel.add(tableNamePrefixPanel);
+        } else {
+            tablePanel.add(tableNameFieldPanel);
+            tablePanel.add(keyFieldPanel);
+        }
 
 
         /**
@@ -263,9 +274,7 @@ public class MybatisPlusGeneratorMainUI extends JFrame {
 
         JPanel mainPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
         mainPanel.setBorder(new EmptyBorder(10, 30, 5, 40));
-        if (!multiTable) {
-            mainPanel.add(tablePanel);
-        }
+        mainPanel.add(tablePanel);
         mainPanel.add(projectFolderPanel);
         mainPanel.add(modelPanel);
         mainPanel.add(daoPanel);
@@ -340,7 +349,9 @@ public class MybatisPlusGeneratorMainUI extends JFrame {
                 for (PsiElement psiElement : psiElements) {
                     TableInfo tableInfo = new TableInfo((DbTable) psiElement);
                     String tableName = tableInfo.getTableName();
-                    String modelName = StringUtils.dbStringToCamelStyle(tableName);
+                    String prefix = tableNamePrefixField.getText();
+                    String modelName = StringUtils.dbStringToCamelStyle(tableName.startsWith(prefix) ?
+                            tableName.substring(tableName.indexOf(prefix) + prefix.length()) : tableName);
                     String primaryKey = "";
                     if (tableInfo.getPrimaryKeys() != null && tableInfo.getPrimaryKeys().size() != 0) {
                         primaryKey = tableInfo.getPrimaryKeys().get(0);
