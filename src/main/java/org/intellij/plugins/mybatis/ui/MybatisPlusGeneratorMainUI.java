@@ -9,19 +9,28 @@ import com.intellij.openapi.actionSystem.PlatformDataKeys;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.fileChooser.FileChooserDescriptorFactory;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.roots.FileIndex;
+import com.intellij.openapi.roots.ProjectRootManager;
 import com.intellij.openapi.ui.Messages;
 import com.intellij.openapi.ui.TextBrowseFolderListener;
 import com.intellij.openapi.ui.TextFieldWithBrowseButton;
+import com.intellij.psi.JavaDirectoryService;
+import com.intellij.psi.PsiDirectory;
 import com.intellij.psi.PsiElement;
+import com.intellij.psi.PsiManager;
 import com.intellij.psi.PsiPackage;
 import com.intellij.ui.components.JBLabel;
 import com.intellij.ui.components.JBPanel;
 import com.intellij.ui.components.JBTextField;
+import com.intellij.util.containers.ContainerUtil;
 import main.java.org.intellij.plugins.mybatis.generate.MybatisPlusGenerator;
 import main.java.org.intellij.plugins.mybatis.model.Config;
+import main.java.org.intellij.plugins.mybatis.model.PackageNode;
 import main.java.org.intellij.plugins.mybatis.model.TableInfo;
 import main.java.org.intellij.plugins.mybatis.utils.JTextFieldHintListener;
 import main.java.org.intellij.plugins.mybatis.utils.StringUtils;
+import org.jetbrains.jps.model.java.JavaModuleSourceRootTypes;
+import org.jetbrains.jps.model.java.JavaSourceRootType;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -190,9 +199,12 @@ public class MybatisPlusGeneratorMainUI extends JFrame {
             modelNameFieldPanel.add(modelNameField);
             modelPanel.add(modelNameFieldPanel);
         }
+
+        PackageNode packageNode = getPackageNode();
+        String modelPackage = getPackage(packageNode, "model");
         JBLabel labelLeft4 = new JBLabel("package:");
         modelPanel.add(labelLeft4);
-        modelPackageField.setText("generate");
+        modelPackageField.setText(modelPackage);
         modelPanel.add(modelPackageField);
         JButton modelPackageFieldBtn = new JButton("...");
         modelPackageFieldBtn.addActionListener(actionEvent -> {
@@ -228,10 +240,10 @@ public class MybatisPlusGeneratorMainUI extends JFrame {
             daoPanel.add(daoNameField);
         }
 
-
+        String daoPackage = getPackage(packageNode, "dao");
         JLabel labelLeft5 = new JLabel("package:");
         daoPanel.add(labelLeft5);
-        daoPackageField.setText("generate");
+        daoPackageField.setText(daoPackage);
         daoPanel.add(daoPackageField);
         JButton packageBtn2 = new JButton("...");
         packageBtn2.addActionListener(actionEvent -> {
@@ -405,4 +417,56 @@ public class MybatisPlusGeneratorMainUI extends JFrame {
     private void onCancel() {
         dispose();
     }
+
+    private String getPackage(PackageNode rootNode, String packageName) {
+        PackageNode root = rootNode;
+        while (root.getChildren().size() == 1) {
+            root = root.getChildren().get(0);
+        }
+        for (PackageNode packageNode : root.getChildren()) {
+            if (packageNode.getPsiPackage().getName().equals(packageName)) {
+                return packageNode.getPsiPackage().getQualifiedName();
+            }
+        }
+        return root.getPsiPackage().getQualifiedName();
+    }
+
+    private PackageNode getPackageNode() {
+        PsiManager psiManager = PsiManager.getInstance(project);
+        FileIndex fileIndex = ProjectRootManager.getInstance(project).getFileIndex();
+        List<PsiPackage> list = new ArrayList<>();
+        fileIndex.iterateContent((fileOrDir) -> {
+            if (fileOrDir.isDirectory() && fileIndex.isUnderSourceRootOfType(fileOrDir,
+                    ContainerUtil.newHashSet(new JavaSourceRootType[]{JavaSourceRootType.SOURCE}))) {
+                PsiDirectory psiDirectory = psiManager.findDirectory(fileOrDir);
+                PsiPackage aPackage = JavaDirectoryService.getInstance().getPackage(psiDirectory);
+                if (aPackage != null) {
+                    System.out.println(aPackage.getQualifiedName());
+                    list.add(aPackage);
+                }
+            }
+            return true;
+        });
+        PsiPackage root = null;
+        for (PsiPackage psiPackage : list) {
+            if (psiPackage.getParentPackage() == null) {
+                root = psiPackage;
+                break;
+            }
+        }
+        PackageNode rootNode = new PackageNode(root);
+        getSubNode(rootNode, list);
+        return rootNode;
+    }
+
+    private void getSubNode(PackageNode parentNode, List<PsiPackage> list) {
+        for (PsiPackage psiPackage : list) {
+            if (parentNode.getPsiPackage().equals(psiPackage.getParentPackage())) {
+                PackageNode node = new PackageNode(psiPackage, parentNode);
+                parentNode.addChild(node);
+                getSubNode(node, list);
+            }
+        }
+    }
+
 }
