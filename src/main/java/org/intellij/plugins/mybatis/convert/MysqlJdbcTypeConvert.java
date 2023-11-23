@@ -12,6 +12,9 @@ public class MysqlJdbcTypeConvert implements IJdbcTypeConvert {
         if (fieldType.equalsIgnoreCase("datetime")) {
             return "TIMESTAMP";
         }
+        if (fieldType.equalsIgnoreCase("text")) {
+            return "VARCHAR";
+        }
         return fieldType;
     }
 }
